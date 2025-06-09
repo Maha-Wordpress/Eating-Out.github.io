@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eating Out - Interactive Vocabulary Learning</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .nav-tab {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .nav-tab:hover, .nav-tab.active {
+            background: white;
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .content-section {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            color: #667eea;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .vocabulary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .vocab-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 4px solid #667eea;
+            transition: transform 0.3s ease;
+        }
+
+        .vocab-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .vocab-word {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .vocab-definition {
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .vocab-example {
+            font-style: italic;
+            color: #888;
+            margin-bottom: 15px;
+        }
+
+        .audio-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s ease;
+        }
+
+        .audio-btn:hover {
+            background: #5a67d8;
+        }
+
+        .activities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .activity-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .activity-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .activity-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .activity-title {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+
+        .conversation-container {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .conversation-title {
+            font-size: 1.3rem;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .dialogue {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .speaker {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .questions {
+            margin-top: 20px;
+        }
+
+        .question {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .question-text {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .option {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 5px;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option:hover {
+            border-color: #667eea;
+            background: #e3f2fd;
+        }
+
+        .option.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .option.correct {
+            background: #4caf50;
+            color: white;
+            border-color: #4caf50;
+        }
+
+        .option.incorrect {
+            background: #f44336;
+            color: white;
+            border-color: #f44336;
+        }
+
+        .pronunciation-section {
+            text-align: center;
+        }
+
+        .word-display {
+            font-size: 2rem;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .recording-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .record-btn, .play-btn, .stop-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s ease;
+        }
+
+        .record-btn:hover, .play-btn:hover, .stop-btn:hover {
+            background: #5a67d8;
+        }
+
+        .record-btn:disabled, .play-btn:disabled, .stop-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .feedback.good {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .feedback.needs-improvement {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .word-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .word-btn {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .word-btn:hover, .word-btn.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 90vw;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        .game-container {
+            text-align: center;
+        }
+
+        .matching-game {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 20px 0;
+        }
+
+        .words-column, .definitions-column {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .match-item {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .match-item:hover {
+            border-color: #667eea;
+        }
+
+        .match-item.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .match-item.matched {
+            background: #4caf50;
+            color: white;
+            border-color: #4caf50;
+            cursor: default;
+        }
+
+        .score-display {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin: 20px 0;
+        }
+
+        .certificate-section {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .certificate-form {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .generate-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .generate-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress-container {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .progress-bar {
+            background: #e9ecef;
+            border-radius: 10px;
+            height: 20px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .progress-fill {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .matching-game {
+                grid-template-columns: 1fr;
+            }
+            
+            .vocabulary-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .activities-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-utensils"></i> Eating Out - Interactive Learning</h1>
+            <p>Master restaurant vocabulary with interactive activities and conversations</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showSection('vocabulary')">
+                <i class="fas fa-book"></i> Vocabulary
+            </button>
+            <button class="nav-tab" onclick="showSection('conversations')">
+                <i class="fas fa-comments"></i> Conversations
+            </button>
+            <button class="nav-tab" onclick="showSection('pronunciation')">
+                <i class="fas fa-microphone"></i> Pronunciation
+            </button>
+            <button class="nav-tab" onclick="showSection('activities')">
+                <i class="fas fa-gamepad"></i> Activities
+            </button>
+            <button class="nav-tab" onclick="showSection('certificate')">
+                <i class="fas fa-certificate"></i> Certificate
+            </button>
+        </div>
+
+        <!-- Progress Section -->
+        <div class="progress-container">
+            <div class="progress-text">Learning Progress: <span id="progressPercent">0%</span></div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+            <p>Complete activities to unlock your certificate!</p>
+        </div>
+
+        <!-- Vocabulary Section -->
+        <div id="vocabulary" class="content-section active">
+            <h2 class="section-title">Restaurant Vocabulary</h2>
+            <div class="vocabulary-grid" id="vocabularyGrid">
+                <!-- Vocabulary cards will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Conversations Section -->
+        <div id="conversations" class="content-section">
+            <h2 class="section-title">Real-Life Conversations</h2>
+            <div id="conversationsContainer">
+                <!-- Conversations will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Pronunciation Section -->
+        <div id="pronunciation" class="content-section">
+            <h2 class="section-title">Pronunciation Practice</h2>
+            <div class="pronunciation-section">
+                <div class="word-display" id="currentWord">Select a word to practice</div>
+                <div class="recording-controls">
+                    <button class="audio-btn" id="listenBtn" onclick="playWord()" disabled>
+                        <i class="fas fa-volume-up"></i> Listen
+                    </button>
+                    <button class="record-btn" id="recordBtn" onclick="startRecording()" disabled>
+                        <i class="fas fa-microphone"></i> Record
+                    </button>
+                    <button class="stop-btn" id="stopBtn" onclick="stopRecording()" disabled>
+                        <i class="fas fa-stop"></i> Stop
+                    </button>
+                    <button class="play-btn" id="playbackBtn" onclick="playRecording()" disabled>
+                        <i class="fas fa-play"></i> Play Recording
+                    </button>
+                </div>
+                <div id="feedback" class="feedback" style="display: none;"></div>
+                <div class="word-selector" id="wordSelector">
+                    <!-- Word selection buttons will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Activities Section -->
+        <div id="activities" class="content-section">
+            <h2 class="section-title">Interactive Activities</h2>
+            <div class="activities-grid">
+                <div class="activity-card" onclick="startMatchingGame()">
+                    <div class="activity-icon"><i class="fas fa-puzzle-piece"></i></div>
+                    <div class="activity-title">Vocabulary Matching</div>
+                    <p>Match words with their definitions</p>
+                </div>
+                <div class="activity-card" onclick="startQuiz()">
+                    <div class="activity-icon"><i class="fas fa-question-circle"></i></div>
+                    <div class="activity-title">Quick Quiz</div>
+                    <p>Test your knowledge with multiple choice</p>
+                </div>
+                <div class="activity-card" onclick="startListeningGame()">
+                    <div class="activity-icon"><i class="fas fa-headphones"></i></div>
+                    <div class="activity-title">Listening Practice</div>
+                    <p>Identify words by listening</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Certificate Section -->
+        <div id="certificate" class="content-section">
+            <h2 class="section-title">Certificate of Completion</h2>
+            <div class="certificate-section">
+                <div class="certificate-form">
+                    <h3>Congratulations on completing the course!</h3>
+                    <p>Enter your details to generate your personalized certificate:</p>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="studentName">Full Name:</label>
+                        <input type="text" id="studentName" class="form-input" placeholder="Enter your full name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="courseName">Course:</label>
+                        <input type="text" id="courseName" class="form-input" value="Eating Out - Interactive Vocabulary Learning" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="completionDate">Date of Completion:</label>
+                        <input type="text" id="completionDate" class="form-input" readonly>
+                    </div>
+                    
+                    <button class="generate-btn" id="generateCertBtn" onclick="generateCertificate()" disabled>
+                        <i class="fas fa-download"></i> Generate Certificate
+                    </button>
+                    
+                    <p style="margin-top: 20px; color: #666; font-size: 0.9rem;">
+                        Complete at least 70% of the activities to unlock certificate generation.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="gameModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            <div id="gameContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Vocabulary data
+        const vocabularyData = {
+            restaurantTypes: [
+                { word: "Fast Food Restaurant", definition: "A restaurant that serves quick, inexpensive food", example: "McDonald's is a popular fast food restaurant." },
+                { word: "Fine Dining", definition: "An upscale restaurant with high-quality food and service", example: "We went to a fine dining restaurant for our anniversary." },
+                { word: "Casual Dining", definition: "A restaurant with a relaxed atmosphere and moderate prices", example: "Applebee's is a casual dining restaurant." },
+                { word: "Food Truck", definition: "A mobile restaurant that serves food from a truck", example: "The food truck serves delicious tacos." }
+            ],
+            menuItems: [
+                { word: "Appetizer", definition: "A small dish served before the main course", example: "We ordered calamari as an appetizer." },
+                { word: "Main Course", definition: "The primary dish of a meal", example: "The steak was my main course." },
+                { word: "Dessert", definition: "A sweet dish served at the end of a meal", example: "Chocolate cake is my favorite dessert." },
+                { word: "Beverage", definition: "A drink", example: "Would you like a beverage with your meal?" }
+            ],
+            restaurantVocab: [
+                { word: "Waiter/Waitress", definition: "A person who serves food in a restaurant", example: "The waitress took our order quickly." },
+                { word: "Menu", definition: "A list of food and drinks available", example: "Can I see the menu, please?" },
+                { word: "Reservation", definition: "Booking a table in advance", example: "I made a reservation for 7 PM." },
+                { word: "Bill/Check", definition: "The amount of money owed for a meal", example: "Could we have the bill, please?" },
+                { word: "Tip", definition: "Extra money given for good service", example: "We left a 20% tip for excellent service." },
+                { word: "To-go/Takeout", definition: "Food ordered to eat elsewhere", example: "I'll have this to-go, please." }
+            ]
+        };
+
+        // Conversation data
+        const conversations = [
+            {
+                title: "Making a Reservation",
+                dialogue: [
+                    { speaker: "Customer", text: "Hello, I'd like to make a reservation for tonight." },
+                    { speaker: "Host", text: "Certainly! For how many people?" },
+                    { speaker: "Customer", text: "Four people, please." },
+                    { speaker: "Host", text: "What time would you prefer?" },
+                    { speaker: "Customer", text: "Around 7:30 PM if possible." },
+                    { speaker: "Host", text: "Perfect! I have a table available at 7:30. May I have your name?" },
+                    { speaker: "Customer", text: "Yes, it's Johnson." },
+                    { speaker: "Host", text: "Great! Table for four under Johnson at 7:30 PM. See you tonight!" }
+                ],
+                questions: [
+                    {
+                        question: "How many people is the reservation for?",
+                        options: ["Two", "Three", "Four", "Five"],
+                        correct: 2
+                    },
+                    {
+                        question: "What time did the customer request?",
+                        options: ["7:00 PM", "7:30 PM", "8:00 PM", "8:30 PM"],
+                        correct: 1
+                    }
+                ]
+            },
+            {
+                title: "Ordering Food",
+                dialogue: [
+                    { speaker: "Waiter", text: "Good evening! Are you ready to order?" },
+                    { speaker: "Customer", text: "Yes, I'll start with the Caesar salad." },
+                    { speaker: "Waiter", text: "Excellent choice! And for your main course?" },
+                    { speaker: "Customer", text: "I'll have the grilled salmon, please." },
+                    { speaker: "Waiter", text: "How would you like that cooked?" },
+                    { speaker: "Customer", text: "Medium, please." },
+                    { speaker: "Waiter", text: "Perfect! And what would you like to drink?" },
+                    { speaker: "Customer", text: "I'll have a glass of white wine." }
+                ],
+                questions: [
+                    {
+                        question: "What appetizer did the customer order?",
+                        options: ["Garden salad", "Caesar salad", "Soup", "Bread"],
+                        correct: 1
+                    },
+                    {
+                        question: "How did the customer want the salmon cooked?",
+                        options: ["Rare", "Medium", "Well-done", "Medium-rare"],
+                        correct: 1
+                    }
+                ]
+            }
+        ];
+
+        // Global variables
+        let currentProgress = 0;
+        let completedActivities = new Set();
+        let mediaRecorder;
+        let recordedChunks = [];
+        let currentSelectedWord = null;
+        let speechSynthesis = window.speechSynthesis;
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+        });
+
+        function initializeApp() {
+            renderVocabulary();
+            renderConversations();
+            renderPronunciationWords();
+            updateProgress();
+            
+            // Set current date for certificate
+            document.getElementById('completionDate').value = new Date().toLocaleDateString();
+            
+            // Enable certificate generation based on progress
+            document.getElementById('studentName').addEventListener('input', checkCertificateEligibility);
+        }
+
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Update navigation
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        function renderVocabulary() {
+            const container = document.getElementById('vocabularyGrid');
+            let html = '';
+            
+            // Combine all vocabulary categories
+            const allVocab = [
+                ...vocabularyData.restaurantTypes,
+                ...vocabularyData.menuItems,
+                ...vocabularyData.restaurantVocab
+            ];
+            
+            allVocab.forEach(item => {
+                html += `
+                    <div class="vocab-card">
+                        <div class="vocab-word">${item.word}</div>
+                        <div class="vocab-definition">${item.definition}</div>
+                        <div class="vocab-example">"${item.example}"</div>
+                        <button class="audio-btn" onclick="speakWord('${item.word}')">
+                            <i class="fas fa-volume-up"></i> Listen
+                        </button>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function renderConversations() {
+            const container = document.getElementById('conversationsContainer');
+            let html = '';
+            
+            conversations.forEach((conv, index) => {
+                html += `
+                    <div class="conversation-container">
+                        <div class="conversation-title">${conv.title}</div>
+                        <div class="dialogue-container">
+                `;
+                
+                conv.dialogue.forEach(line => {
+                    html += `
+                        <div class="dialogue">
+                            <span class="speaker">${line.speaker}:</span> ${line.text}
+                        </div>
+                    `;
+                });
+                
+                html += `
+                        </div>
+                        <button class="audio-btn" onclick="playConversation(${index})" style="margin: 15px 0;">
+                            <i class="fas fa-play"></i> Play Conversation
+                        </button>
+                        <div class="questions">
+                            <h4>Comprehension Questions:</h4>
+                `;
+                
+                conv.questions.forEach((q, qIndex) => {
+                    html += `
+                        <div class="question">
+                            <div class="question-text">${q.question}</div>
+                            <div class="options">
+                    `;
+                    
+                    q.options.forEach((option, oIndex) => {
+                        html += `
+                            <div class="option" onclick="selectOption(${index}, ${qIndex}, ${oIndex})">
+                                ${option}
+                            </div>
+                        `;
+                    });
+                    
+                    html += `
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += `
+                        <button class="audio-btn" onclick="checkConversationAnswers(${index})" style="margin-top: 15px;">
+                            Check Answers
+                        </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function renderPronunciationWords() {
+            const container = document.getElementById('wordSelector');
+            let html = '';
+            
+            const allWords = [
+                ...vocabularyData.restaurantTypes.map(item => item.word),
+                ...vocabularyData.menuItems.map(item => item.word),
+                ...vocabularyData.restaurantVocab.map(item => item.word)
+            ];
+            
+            allWords.forEach(word => {
+                html += `
+                    <button class="word-btn" onclick="selectWordForPractice('${word}')">
+                        ${word}
+                    </button>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function speakWord(word) {
+            if (speechSynthesis) {
+                const utterance = new SpeechSynthesisUtterance(word);
+                utterance.rate = 0.8;
+                utterance.pitch = 1;
+                speechSynthesis.speak(utterance);
+            }
+        }
+
+        function playConversation(index) {
+            const conversation = conversations[index];
+            let currentLine = 0;
+            
+            function speakNextLine() {
+                if (currentLine < conversation.dialogue.length) {
+                    const line = conversation.dialogue[currentLine];
+                    const utterance = new SpeechSynthesisUtterance(`${line.speaker} says: ${line.text}`);
+                    utterance.rate = 0.9;
+                    utterance.onend = () => {
+                        currentLine++;
+                        setTimeout(speakNextLine, 500);
+                    };
+                    speechSynthesis.speak(utterance);
+                }
+            }
+            
+            speakNextLine();
+        }
+
+        function selectOption(convIndex, questionIndex, optionIndex) {
+            const questionElement = document.querySelectorAll('.conversation-container')[convIndex]
+                .querySelectorAll('.question')[questionIndex];
+            
+            // Remove previous selections
+            questionElement.querySelectorAll('.option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Add selection to clicked option
+            questionElement.querySelectorAll('.option')[optionIndex].classList.add('selected');
+        }
+
+        function checkConversationAnswers(convIndex) {
+            const conversation = conversations[convIndex];
+            const conversationElement = document.querySelectorAll('.conversation-container')[convIndex];
+            let correct = 0;
+            
+            conversation.questions.forEach((question, qIndex) => {
+                const questionElement = conversationElement.querySelectorAll('.question')[qIndex];
+                const selectedOption = questionElement.querySelector('.option.selected');
+                const options = questionElement.querySelectorAll('.option');
+                
+                if (selectedOption) {
+                    const selectedIndex = Array.from(options).indexOf(selectedOption);
+                    if (selectedIndex === question.correct) {
+                        selectedOption.classList.add('correct');
+                        correct++;
+                    } else {
+                        selectedOption.classList.add('incorrect');
+                        options[question.correct].classList.add('correct');
+                    }
+                } else {
+                    options[question.correct].classList.add('correct');
+                }
+            });
+            
+            // Mark activity as completed
+            completedActivities.add('conversation-' + convIndex);
+            updateProgress();
+            
+            alert(`You got ${correct} out of ${conversation.questions.length} questions correct!`);
+        }
+
+        function selectWordForPractice(word) {
+            currentSelectedWord = word;
+            document.getElementById('currentWord').textContent = word;
+            
+            // Update word selector buttons
+            document.querySelectorAll('.word-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+            
+            // Enable buttons
+            document.getElementById('listenBtn').disabled = false;
+            document.getElementById('recordBtn').disabled = false;
+        }
+
+        function playWord() {
+            if (currentSelectedWord) {
+                speakWord(currentSelectedWord);
+            }
+        }
+
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                recordedChunks = [];
+                
+                mediaRecorder.ondataavailable = event => {
+                    if (event.data.size > 0) {
+                        recordedChunks.push(event.data);
+                    }
+                };
+                
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(recordedChunks, { type: 'audio/wav' });
+                    const audioUrl = URL.createObjectURL(blob);
+                    document.getElementById('playbackBtn').disabled = false;
+                    document.getElementById('playbackBtn').onclick = () => {
+                        const audio = new Audio(audioUrl);
+                        audio.play();
+                    };
+                    
+                    // Show feedback
+                    showPronunciationFeedback();
+                };
+                
+                mediaRecorder.start();
+                document.getElementById('recordBtn').disabled = true;
+                document.getElementById('stopBtn').disabled = false;
+                
+            } catch (error) {
+                alert('Microphone access is required for pronunciation practice.');
+            }
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+                
+                document.getElementById('recordBtn').disabled = false;
+                document.getElementById('stopBtn').disabled = true;
+                
+                // Mark activity as completed
+                completedActivities.add('pronunciation-' + currentSelectedWord);
+                updateProgress();
+            }
+        }
+
+        function playRecording() {
+            // This function is dynamically set in stopRecording
+        }
+
+        function showPronunciationFeedback() {
+            const feedback = document.getElementById('feedback');
+            feedback.style.display = 'block';
+            feedback.className = 'feedback good';
+            feedback.innerHTML = `
+                <strong>Great job!</strong> You've practiced pronouncing "${currentSelectedWord}". 
+                Keep practicing to improve your pronunciation!
+            `;
+        }
+
+        function startMatchingGame() {
+            const gameContent = document.getElementById('gameContent');
+            const words = vocabularyData.menuItems.slice(0, 4); // Use 4 words for simplicity
+            
+            let html = `
+                <div class="game-container">
+                    <h3>Vocabulary Matching Game</h3>
+                    <p>Match the words with their definitions</p>
+                    <div class="score-display">Score: <span id="matchScore">0</span>/4</div>
+                    <div class="matching-game">
+                        <div class="words-column">
+                            <h4>Words</h4>
+            `;
+            
+            words.forEach((item, index) => {
+                html += `
+                    <div class="match-item" data-type="word" data-index="${index}" onclick="selectMatchItem(this)">
+                        ${item.word}
+                    </div>
+                `;
+            });
+            
+            html += `
+                        </div>
+                        <div class="definitions-column">
+                            <h4>Definitions</h4>
+            `;
+            
+            // Shuffle definitions
+            const shuffledDefinitions = [...words].sort(() => Math.random() - 0.5);
+            shuffledDefinitions.forEach((item, index) => {
+                const originalIndex = words.findIndex(w => w.word === item.word);
+                html += `
+                    <div class="match-item" data-type="definition" data-index="${originalIndex}" onclick="selectMatchItem(this)">
+                        ${item.definition}
+                    </div>
+                `;
+            });
+            
+            html += `
+                        </div>
+                    </div>
+                    <button class="audio-btn" onclick="resetMatchingGame()" style="margin-top: 20px;">
+                        Reset Game
+                    </button>
+                </div>
+            `;
+            
+            gameContent.innerHTML = html;
+            document.getElementById('gameModal').classList.add('active');
+        }
+
+        let selectedMatchItems = [];
+        let matchScore = 0;
+
+        function selectMatchItem(element) {
+            if (element.classList.contains('matched')) return;
+            
+            if (selectedMatchItems.length === 2) {
+                // Clear previous selections
+                selectedMatchItems.forEach(item => item.classList.remove('selected'));
+                selectedMatchItems = [];
+            }
+            
+            element.classList.add('selected');
+            selectedMatchItems.push(element);
+            
+            if (selectedMatchItems.length === 2) {
+                checkMatch();
+            }
+        }
+
+        function checkMatch() {
+            const [item1, item2] = selectedMatchItems;
+            const index1 = item1.dataset.index;
+            const index2 = item2.dataset.index;
+            
+            if (index1 === index2) {
+                // Correct match
+                item1.classList.add('matched');
+                item2.classList.add('matched');
+                item1.classList.remove('selected');
+                item2.classList.remove('selected');
+                matchScore++;
+                document.getElementById('matchScore').textContent = matchScore;
+                
+                if (matchScore === 4) {
+                    setTimeout(() => {
+                        alert('Congratulations! You completed the matching game!');
+                        completedActivities.add('matching-game');
+                        updateProgress();
+                    }, 500);
+                }
+            } else {
+                // Incorrect match
+                setTimeout(() => {
+                    item1.classList.remove('selected');
+                    item2.classList.remove('selected');
+                }, 1000);
+            }
+            
+            selectedMatchItems = [];
+        }
+
+        function resetMatchingGame() {
+            matchScore = 0;
+            selectedMatchItems = [];
+            startMatchingGame();
+        }
+
+        function startQuiz() {
+            const gameContent = document.getElementById('gameContent');
+            const allVocab = [
+                ...vocabularyData.restaurantTypes,
+                ...vocabularyData.menuItems,
+                ...vocabularyData.restaurantVocab
+            ];
+            
+            const quizWords = allVocab.slice(0, 5); // 5 questions
+            let currentQuestion = 0;
+            let score = 0;
+            
+            function showQuestion() {
+                const word = quizWords[currentQuestion];
+                const options = [word.definition];
+                
+                // Add 3 random wrong answers
+                while (options.length < 4) {
+                    const randomWord = allVocab[Math.floor(Math.random() * allVocab.length)];
+                    if (!options.includes(randomWord.definition)) {
+                        options.push(randomWord.definition);
+                    }
+                }
+                
+                // Shuffle options
+                const shuffledOptions = options.sort(() => Math.random() - 0.5);
+                const correctIndex = shuffledOptions.indexOf(word.definition);
+                
+                let html = `
+                    <div class="game-container">
+                        <h3>Quick Quiz</h3>
+                        <p>Question ${currentQuestion + 1} of ${quizWords.length}</p>
+                        <div class="score-display">Score: ${score}/${quizWords.length}</div>
+                        <div class="question">
+                            <div class="question-text">What does "${word.word}" mean?</div>
+                            <div class="options">
+                `;
+                
+                shuffledOptions.forEach((option, index) => {
+                    html += `
+                        <div class="option" onclick="selectQuizAnswer(${index}, ${correctIndex})">
+                            ${option}
+                        </div>
+                    `;
+                });
+                
+                html += `
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                gameContent.innerHTML = html;
+            }
+            
+            window.selectQuizAnswer = function(selected, correct) {
+                const options = document.querySelectorAll('#gameContent .option');
+                options[selected].classList.add('selected');
+                
+                setTimeout(() => {
+                    if (selected === correct) {
+                        options[selected].classList.add('correct');
+                        score++;
+                    } else {
+                        options[selected].classList.add('incorrect');
+                        options[correct].classList.add('correct');
+                    }
+                    
+                    setTimeout(() => {
+                        currentQuestion++;
+                        if (currentQuestion < quizWords.length) {
+                            showQuestion();
+                        } else {
+                            // Quiz completed
+                            gameContent.innerHTML = `
+                                <div class="game-container">
+                                    <h3>Quiz Complete!</h3>
+                                    <div class="score-display">Final Score: ${score}/${quizWords.length}</div>
+                                    <p>${score >= 3 ? 'Excellent work!' : 'Keep practicing!'}</p>
+                                    <button class="audio-btn" onclick="startQuiz()">Try Again</button>
+                                </div>
+                            `;
+                            completedActivities.add('quiz');
+                            updateProgress();
+                        }
+                    }, 2000);
+                }, 1000);
+            };
+            
+            showQuestion();
+            document.getElementById('gameModal').classList.add('active');
+        }
+
+        function startListeningGame() {
+            const gameContent = document.getElementById('gameContent');
+            const words = vocabularyData.menuItems.slice(0, 4);
+            let currentWordIndex = 0;
+            let score = 0;
+            
+            function showListeningQuestion() {
+                const currentWord = words[currentWordIndex];
+                const options = [currentWord.word];
+                
+                // Add wrong options
+                while (options.length < 4) {
+                    const randomWord = vocabularyData.menuItems[Math.floor(Math.random() * vocabularyData.menuItems.length)];
+                    if (!options.includes(randomWord.word)) {
+                        options.push(randomWord.word);
+                    }
+                }
+                
+                const shuffledOptions = options.sort(() => Math.random() - 0.5);
+                const correctIndex = shuffledOptions.indexOf(currentWord.word);
+                
+                let html = `
+                    <div class="game-container">
+                        <h3>Listening Practice</h3>
+                        <p>Question ${currentWordIndex + 1} of ${words.length}</p>
+                        <div class="score-display">Score: ${score}/${words.length}</div>
+                        <p>Listen to the word and select the correct option:</p>
+                        <button class="audio-btn" onclick="speakWord('${currentWord.word}')" style="margin: 20px 0;">
+                            <i class="fas fa-volume-up"></i> Play Word
+                        </button>
+                        <div class="options">
+                `;
+                
+                shuffledOptions.forEach((option, index) => {
+                    html += `
+                        <div class="option" onclick="selectListeningAnswer(${index}, ${correctIndex})">
+                            ${option}
+                        </div>
+                    `;
+                });
+                
+                html += `
+                        </div>
+                    </div>
+                `;
+                
+                gameContent.innerHTML = html;
+            }
+            
+            window.selectListeningAnswer = function(selected, correct) {
+                const options = document.querySelectorAll('#gameContent .option');
+                options[selected].classList.add('selected');
+                
+                setTimeout(() => {
+                    if (selected === correct) {
+                        options[selected].classList.add('correct');
+                        score++;
+                    } else {
+                        options[selected].classList.add('incorrect');
+                        options[correct].classList.add('correct');
+                    }
+                    
+                    setTimeout(() => {
+                        currentWordIndex++;
+                        if (currentWordIndex < words.length) {
+                            showListeningQuestion();
+                        } else {
+                            gameContent.innerHTML = `
+                                <div class="game-container">
+                                    <h3>Listening Practice Complete!</h3>
+                                    <div class="score-display">Final Score: ${score}/${words.length}</div>
+                                    <p>${score >= 3 ? 'Great listening skills!' : 'Keep practicing!'}</p>
+                                    <button class="audio-btn" onclick="startListeningGame()">Try Again</button>
+                                </div>
+                            `;
+                            completedActivities.add('listening-game');
+                            updateProgress();
+                        }
+                    }, 2000);
+                }, 1000);
+            };
+            
+            showListeningQuestion();
+            document.getElementById('gameModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('gameModal').classList.remove('active');
+        }
+
+        function updateProgress() {
+            const totalActivities = 10; // Approximate total activities
+            const completed = completedActivities.size;
+            const percentage = Math.min(Math.round((completed / totalActivities) * 100), 100);
+            
+            document.getElementById('progressFill').style.width = percentage + '%';
+            document.getElementById('progressPercent').textContent = percentage + '%';
+            
+            currentProgress = percentage;
+            checkCertificateEligibility();
+        }
+
+        function checkCertificateEligibility() {
+            const nameInput = document.getElementById('studentName');
+            const generateBtn = document.getElementById('generateCertBtn');
+            
+            const hasName = nameInput.value.trim().length > 0;
+            const hasProgress = currentProgress >= 70;
+            
+            generateBtn.disabled = !(hasName && hasProgress);
+            
+            if (hasProgress) {
+                generateBtn.parentElement.querySelector('p').textContent = 
+                    hasName ? 'Click to generate your certificate!' : 'Enter your name to generate certificate.';
+            }
+        }
+
+        function generateCertificate() {
+            const studentName = document.getElementById('studentName').value.trim();
+            const courseName = document.getElementById('courseName').value;
+            const completionDate = document.getElementById('completionDate').value;
+            
+            if (!studentName) {
+                alert('Please enter your name.');
+                return;
+            }
+            
+            // Create PDF certificate using jsPDF
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({
+                orientation: 'landscape',
+                unit: 'mm',
+                format: 'a4'
+            });
+            
+            // Certificate design
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            
+            // Background border
+            doc.setDrawColor(102, 126, 234);
+            doc.setLineWidth(3);
+            doc.rect(10, 10, pageWidth - 20, pageHeight - 20);
+            
+            // Inner border
+            doc.setLineWidth(1);
+            doc.rect(15, 15, pageWidth - 30, pageHeight - 30);
+            
+            // Title
+            doc.setFontSize(32);
+            doc.setTextColor(102, 126, 234);
+            doc.setFont(undefined, 'bold');
+            doc.text('Certificate of Completion', pageWidth / 2, 40, { align: 'center' });
+            
+            // Subtitle
+            doc.setFontSize(16);
+            doc.setTextColor(100, 100, 100);
+            doc.setFont(undefined, 'normal');
+            doc.text('This is to certify that', pageWidth / 2, 60, { align: 'center' });
+            
+            // Student name
+            doc.setFontSize(28);
+            doc.setTextColor(0, 0, 0);
+            doc.setFont(undefined, 'bold');
+            doc.text(studentName, pageWidth / 2, 80, { align: 'center' });
+            
+            // Course completion text
+            doc.setFontSize(16);
+            doc.setTextColor(100, 100, 100);
+            doc.setFont(undefined, 'normal');
+            doc.text('has successfully completed the course', pageWidth / 2, 100, { align: 'center' });
+            
+            // Course name
+            doc.setFontSize(20);
+            doc.setTextColor(102, 126, 234);
+            doc.setFont(undefined, 'bold');
+            doc.text(courseName, pageWidth / 2, 120, { align: 'center' });
+            
+            // Completion details
+            doc.setFontSize(14);
+            doc.setTextColor(100, 100, 100);
+            doc.setFont(undefined, 'normal');
+            doc.text(`with ${currentProgress}% completion rate`, pageWidth / 2, 140, { align: 'center' });
+            
+            // Date
+            doc.setFontSize(12);
+            doc.text(`Date of Completion: ${completionDate}`, pageWidth / 2, 160, { align: 'center' });
+            
+            // Signature line
+            doc.setDrawColor(0, 0, 0);
+            doc.setLineWidth(0.5);
+            doc.line(pageWidth / 2 - 30, 180, pageWidth / 2 + 30, 180);
+            doc.text('Instructor Signature', pageWidth / 2, 190, { align: 'center' });
+            
+            // Footer
+            doc.setFontSize(10);
+            doc.setTextColor(150, 150, 150);
+            doc.text('Interactive Vocabulary Learning Platform', pageWidth / 2, pageHeight - 20, { align: 'center' });
+            
+            // Save the PDF
+            doc.save(`${studentName.replace(/\s+/g, '_')}_Eating_Out_Certificate.pdf`);
+            
+            alert('Certificate generated successfully! Check your downloads folder.');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('gameModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
+
